@@ -1,0 +1,21 @@
+@media (max-width: 960px) {
+  .strudel-app {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .source-panel {
+    border-right: 0;
+    border-bottom: 1px solid #d7dde7;
+  }
+
+  .workspace__body {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(260px, 0.42fr) minmax(360px, 0.58fr);
+  }
+
+  .composition-column {
+    border-right: 0;
+    border-bottom: 1px solid #d7dde7;
+  }
+}

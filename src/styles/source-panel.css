@@ -1,0 +1,154 @@
+.source-panel {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  border-right: 1px solid #d7dde7;
+  background: #eef1f5;
+}
+
+.source-panel__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.source-panel h1 {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.2;
+  font-weight: 650;
+}
+
+.source-status {
+  margin-left: auto;
+  padding: 3px 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.source-status.is-ready {
+  background: #dff3e7;
+  color: #246b47;
+}
+
+.source-status.is-warning {
+  background: #fff0d1;
+  color: #8b4b00;
+}
+
+.segmented-control {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 3px;
+  border: 1px solid #c7ced8;
+  border-radius: 7px;
+  background: #dde3ea;
+}
+
+.segmented-control button {
+  height: 30px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #4f5a64;
+}
+
+.segmented-control button.is-active {
+  background: #ffffff;
+  color: #1f2328;
+  box-shadow: 0 1px 2px rgb(31 35 40 / 10%);
+}
+
+.source-form {
+  display: grid;
+  gap: 12px;
+}
+
+.source-form label {
+  display: grid;
+  gap: 6px;
+  color: #4f5a64;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.source-form input,
+.source-form select {
+  width: 100%;
+  height: 34px;
+  min-width: 0;
+  padding: 0 9px;
+  border-radius: 6px;
+  color: #1f2328;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.primary-action,
+.launch-action {
+  height: 34px;
+  border-radius: 6px;
+  font-weight: 650;
+}
+
+.primary-action {
+  background: #ffffff;
+}
+
+.launch-action {
+  margin-top: auto;
+  border-color: #2f7d54;
+  background: #2f7d54;
+  color: #ffffff;
+}
+
+.launch-action:hover:not(:disabled) {
+  border-color: #256743;
+}
+
+.source-facts {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-top: 2px;
+}
+
+.source-facts div {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 8px;
+  align-items: baseline;
+}
+
+.source-facts dt {
+  color: #6c7784;
+  font-size: 12px;
+}
+
+.source-facts dd {
+  min-width: 0;
+  margin: 0;
+  color: #1f2328;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.source-warning {
+  margin: 0;
+  padding: 9px 10px;
+  border: 1px solid #f0c36d;
+  border-radius: 7px;
+  background: #fff8e5;
+  color: #704800;
+  font-size: 12px;
+  line-height: 1.4;
+}
