@@ -1,0 +1,42 @@
+.inspector-panel {
+  display: grid;
+  align-content: start;
+}
+
+.inspector-panel__group {
+  display: grid;
+  gap: 8px;
+  border-bottom: 1px solid var(--line);
+  padding: 10px;
+}
+
+.inspector-panel__group p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.inspector-panel code {
+  display: block;
+  overflow-wrap: anywhere;
+  color: var(--green);
+  font-size: 11px;
+}
+
+.session-code {
+  padding: 10px;
+}
+
+.session-code summary {
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.session-code pre {
+  max-height: 260px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  background: #07090b;
+  padding: 10px;
+  white-space: pre-wrap;
+}

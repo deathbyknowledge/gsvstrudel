@@ -1,55 +1,44 @@
-# Strudel Live for GSV
+# Strudel Live
 
-This package is a community example that wraps the upstream Strudel browser
-REPL in a GSV package app. It lets a user select a GSV target, read a
-`strudel.json` sample map from that target, and launch the Strudel editor with a
-generated `samples(...)` prelude.
+Strudel Live is a GSV-native live-coding workstation for Strudel.
 
-It also includes an AI co-producer panel. The package does not call provider
-APIs directly. Instead, its backend uses `proc.spawn`, `proc.send`, and
-`proc.history` so generation runs through the normal GSV process runtime,
-including the configured model, account context, and approval rules.
+It does not iframe `https://strudel.cc`. The package owns the UI, bundles the
+Strudel browser runtime through `@strudel/web`, and uses GSV syscalls for device
+sample staging and co-producer process control.
 
-Strudel is AGPL-3.0. This example does not bundle `@strudel/repl`; it embeds the
-upstream editor at `https://strudel.cc/` and keeps GSV-specific code separate.
-Directly vendoring or modifying Strudel code has additional license
-obligations.
+## What it does
 
-## Target Sample Maps
+- Play/evaluate Strudel pattern bodies directly in the package window.
+- Use a remote sample source such as `github:tidalcycles/dirt-samples`.
+- Load an existing `strudel.json` from GSV or a connected device.
+- Stage a device-backed sample map into `/public/strudel-live/packs/<pack>/`
+  with `fs.copy`, then play it from browser-safe GSV URLs.
+- Capture four local scene slots for fast workspace recall.
+- Start a visible `strudel-live#coproducer` package-profile process and send it
+  the current pattern, source label, and sample names.
 
-For GSV-hosted audio, put files under `/public` so the browser and Strudel can
-fetch them with CORS and byte range support:
+## Sample pack staging
 
-```json
-{
-  "_base": "/public/strudel/drums/",
-  "kick": "kick.wav",
-  "snare": "snare.wav",
-  "hat": ["hat-closed.wav", "hat-open.wav"]
-}
-```
+Point the source panel at a target and a `strudel.json` path, then press
+`Stage pack`.
 
-For device targets, the package can read the `strudel.json` file through
-`fs.read`, but the audio paths inside the map must resolve to URLs that Strudel
-can fetch from the browser, such as `https://...`, `github:owner/repo`, or a
-device-hosted HTTP server with CORS enabled.
+The backend reads the map, copies local/relative sample references into GSV
+public storage, writes a staged `strudel.json`, and switches the app to that
+staged pack. Remote sample URLs are preserved instead of copied.
 
-## AI Flow
+## Co-producer profile
 
-The AI panel asks a temporary process for JSON containing:
+The package declares `profiles/coproducer`. When the package is installed and
+enabled, GSV provisions the profile as a package agent. The app starts that
+profile with `proc.spawn` and displays its transcript instead of hiding a
+throwaway generation process behind a button.
 
-```json
-{
-  "title": "short label",
-  "notes": "one sentence",
-  "code": "Strudel pattern body"
-}
-```
+## License
 
-The UI applies the returned code to the seed editor only after the user clicks
-Apply. Launching the Strudel iframe remains a separate user action.
+This package bundles `@strudel/web`, which is AGPL-3.0-or-later. The package is
+therefore licensed as AGPL-3.0-or-later.
 
-## Validate
+## Development
 
 ```bash
 npm run check

@@ -3,7 +3,7 @@ import { definePackage } from "@humansandmachines/gsv/sdk/manifest";
 export default definePackage({
   meta: {
     displayName: "Strudel Live",
-    description: "Live-coded browser music with target-aware Strudel sample maps.",
+    description: "A GSV-native Strudel workstation with device sample staging and a visible co-producer.",
     window: {
       width: 1280,
       height: 820,
@@ -11,8 +11,8 @@ export default definePackage({
       minHeight: 620,
     },
     capabilities: {
-      kernel: ["sys.device.list", "fs.read", "proc.spawn", "proc.send", "proc.history", "proc.kill"],
-      outbound: ["https://strudel.cc", "https://raw.githubusercontent.com"],
+      kernel: ["sys.device.list", "fs.read", "fs.write", "fs.copy", "proc.spawn", "proc.send", "proc.history"],
+      outbound: ["https://raw.githubusercontent.com"],
     },
   },
   browser: {
@@ -21,9 +21,12 @@ export default definePackage({
       "./src/styles.css",
       "./src/styles/base.css",
       "./src/styles/layout.css",
-      "./src/styles/source-panel.css",
-      "./src/styles/assistant.css",
+      "./src/styles/controls.css",
+      "./src/styles/sources.css",
+      "./src/styles/transport.css",
       "./src/styles/editor.css",
+      "./src/styles/coproducer.css",
+      "./src/styles/inspector.css",
       "./src/styles/responsive.css",
     ],
   },

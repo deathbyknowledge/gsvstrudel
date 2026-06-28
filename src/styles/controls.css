@@ -1,0 +1,122 @@
+.gsv-button,
+.gsv-icon-button {
+  border: 1px solid var(--line-strong);
+  background: var(--panel-2);
+  color: var(--text);
+  min-height: 32px;
+  padding: 0 11px;
+  cursor: pointer;
+}
+
+.gsv-icon-button {
+  width: 32px;
+  padding: 0;
+}
+
+.gsv-button--primary {
+  border-color: rgba(142, 230, 176, 0.7);
+  background: rgba(142, 230, 176, 0.14);
+  color: var(--green);
+}
+
+.gsv-button--danger {
+  border-color: rgba(255, 122, 122, 0.6);
+  background: rgba(255, 122, 122, 0.1);
+  color: var(--red);
+}
+
+.gsv-button:disabled,
+.gsv-icon-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.gsv-button:not(:disabled):hover,
+.gsv-icon-button:not(:disabled):hover {
+  background: var(--panel-3);
+}
+
+.gsv-field {
+  display: grid;
+  gap: 6px;
+}
+
+.gsv-field__label {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.gsv-field__hint {
+  color: var(--faint);
+  font-size: 11px;
+}
+
+.gsv-input,
+.gsv-select,
+.coproducer-prompt,
+.pattern-editor {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: #07090b;
+  color: var(--text);
+}
+
+.gsv-input,
+.gsv-select {
+  height: 34px;
+  padding: 0 9px;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 22px;
+  border: 1px solid var(--line);
+  padding: 0 7px;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.status-pill--good {
+  border-color: rgba(142, 230, 176, 0.5);
+  color: var(--green);
+}
+
+.status-pill--warn {
+  border-color: rgba(242, 197, 107, 0.55);
+  color: var(--amber);
+}
+
+.status-pill--bad {
+  border-color: rgba(255, 122, 122, 0.55);
+  color: var(--red);
+}
+
+.mode-switch {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-bottom: 1px solid var(--line);
+}
+
+.mode-switch button {
+  min-width: 0;
+  border: 0;
+  border-right: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  min-height: 36px;
+  cursor: pointer;
+}
+
+.mode-switch button:last-child {
+  border-right: 0;
+}
+
+.mode-switch button.is-active {
+  color: var(--green);
+  background: rgba(142, 230, 176, 0.1);
+}

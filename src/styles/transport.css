@@ -1,0 +1,28 @@
+.transport-bar {
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px;
+}
+
+.transport-bar__status,
+.transport-bar__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.transport-bar__status {
+  min-width: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.transport-bar__source {
+  max-width: 34ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

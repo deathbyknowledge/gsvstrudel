@@ -1,27 +1,27 @@
+import { PanelTitle } from "./ui/Controls";
+
 type Props = {
   pattern: string;
   sessionCode: string;
+  runtimeError: string;
+  copyState: "idle" | "copied" | "failed";
   onPatternChange(pattern: string): void;
-  onCopyCode(): void;
 };
 
-export function EditorPane({ pattern, sessionCode, onPatternChange, onCopyCode }: Props) {
+export function EditorPane({ copyState, onPatternChange, pattern, runtimeError, sessionCode }: Props) {
   return (
-    <section className="editor-pane" aria-label="Session seed">
-      <div className="editor-pane__bar">
-        <h2>Seed code</h2>
-        <button type="button" onClick={onCopyCode}>Copy</button>
-      </div>
+    <section className="editor-pane">
+      <PanelTitle meta={copyState === "idle" ? `${sessionCode.length} chars` : copyState}>
+        Pattern
+      </PanelTitle>
       <textarea
+        aria-label="Strudel pattern"
         className="pattern-editor"
-        value={pattern}
-        spellcheck={false}
         onInput={(event) => onPatternChange(event.currentTarget.value)}
+        spellcheck={false}
+        value={pattern}
       />
-      <details className="session-code">
-        <summary>Generated launch code</summary>
-        <pre>{sessionCode}</pre>
-      </details>
+      {runtimeError ? <p className="inline-error">{runtimeError}</p> : null}
     </section>
   );
 }

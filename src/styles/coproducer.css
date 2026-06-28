@@ -1,0 +1,60 @@
+.coproducer-panel {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.coproducer-panel__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  padding: 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.coproducer-prompt {
+  min-height: 86px;
+  border-width: 0 0 1px;
+  border-color: var(--line);
+  padding: 10px;
+  line-height: 1.45;
+}
+
+.coproducer-panel > .gsv-button {
+  margin: 10px;
+}
+
+.coproducer-transcript {
+  min-height: 180px;
+  max-height: 320px;
+  overflow: auto;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 10px;
+}
+
+.message {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  padding: 9px;
+}
+
+.message span {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--cyan);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.message--assistant span {
+  color: var(--green);
+}
+
+.message p {
+  margin: 0;
+  color: var(--text);
+  line-height: 1.45;
+  white-space: pre-wrap;
+}

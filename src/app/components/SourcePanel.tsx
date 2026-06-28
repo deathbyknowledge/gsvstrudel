@@ -1,131 +1,172 @@
-import type { LoadedSampleMap, SourceMode, StrudelDevice } from "../types";
+import type {
+  LoadedSampleMap,
+  SourceMode,
+  StagedSamplePack,
+  StageSamplePackResult,
+  StrudelDevice,
+} from "../types";
+import { Button, Field, PanelTitle, StatusPill } from "./ui/Controls";
 
 type Props = {
   devices: StrudelDevice[];
   mode: SourceMode;
   target: string;
   mapPath: string;
-  sourceUrl: string;
+  remoteSource: string;
+  packLabel: string;
   loadingMap: boolean;
+  stagingPack: boolean;
   loadedMap: LoadedSampleMap | null;
+  stagedPack: StagedSamplePack | null;
+  stageResult: StageSamplePackResult | null;
   sourceWarning: string;
-  sourceLabel: string;
   onModeChange(mode: SourceMode): void;
   onTargetChange(target: string): void;
   onMapPathChange(path: string): void;
-  onSourceUrlChange(url: string): void;
+  onRemoteSourceChange(source: string): void;
+  onPackLabelChange(label: string): void;
   onLoadMap(): void;
-  onLaunch(): void;
+  onStagePack(): void;
 };
 
 export function SourcePanel({
   devices,
-  mode,
-  target,
-  mapPath,
-  sourceUrl,
-  loadingMap,
   loadedMap,
-  sourceWarning,
-  sourceLabel,
-  onModeChange,
-  onTargetChange,
-  onMapPathChange,
-  onSourceUrlChange,
+  loadingMap,
+  mapPath,
+  mode,
   onLoadMap,
-  onLaunch,
+  onMapPathChange,
+  onModeChange,
+  onPackLabelChange,
+  onRemoteSourceChange,
+  onStagePack,
+  onTargetChange,
+  packLabel,
+  remoteSource,
+  sourceWarning,
+  stagedPack,
+  stageResult,
+  stagingPack,
+  target,
 }: Props) {
-  const sourceReady = sourceWarning.trim().length === 0;
-
+  const onlineDevices = devices.filter((device) => device.online);
   return (
-    <aside className="source-panel" aria-label="Sound sources">
-      <div className="source-panel__header">
-        <h1>Strudel Live</h1>
-        <span className={sourceReady ? "source-status is-ready" : "source-status is-warning"}>
-          {sourceReady ? "ready" : "check source"}
-        </span>
-      </div>
+    <aside className="source-panel">
+      <PanelTitle meta={`${onlineDevices.length}/${devices.length} online`}>Sources</PanelTitle>
 
-      <div className="segmented-control" role="tablist" aria-label="Source mode">
+      <div className="mode-switch" role="group" aria-label="Sample source">
         <button
+          className={mode === "remote" ? "is-active" : ""}
+          onClick={() => onModeChange("remote")}
           type="button"
-          className={mode === "target-map" ? "is-active" : ""}
-          onClick={() => onModeChange("target-map")}
         >
-          Target map
+          Remote
         </button>
         <button
+          className={mode === "map" ? "is-active" : ""}
+          onClick={() => onModeChange("map")}
           type="button"
-          className={mode === "url" ? "is-active" : ""}
-          onClick={() => onModeChange("url")}
         >
-          URL
+          Map
+        </button>
+        <button
+          className={mode === "staged" ? "is-active" : ""}
+          onClick={() => onModeChange("staged")}
+          type="button"
+        >
+          Staged
         </button>
       </div>
 
-      {mode === "target-map" ? (
-        <div className="source-form">
-          <label>
-            <span>Target</span>
-            <select value={target} onChange={(event) => onTargetChange(event.currentTarget.value)}>
-              <option value="gsv">Kernel (gsv)</option>
-              {devices.map((device) => (
-                <option key={device.deviceId} value={device.deviceId} disabled={!device.online}>
-                  {device.label === device.deviceId ? device.deviceId : `${device.label} · ${device.deviceId}`}
-                  {device.online ? "" : " · offline"}
-                </option>
-              ))}
-            </select>
-          </label>
+      <section className="source-panel__section">
+        <Field label="Remote source" hint="HTTP(S), github:, or shabda:">
+          <input
+            className="gsv-input"
+            onInput={(event) => onRemoteSourceChange(event.currentTarget.value)}
+            value={remoteSource}
+          />
+        </Field>
+        <Button kind={mode === "remote" ? "primary" : "secondary"} onClick={() => onModeChange("remote")}>
+          Use remote
+        </Button>
+      </section>
 
-          <label>
-            <span>strudel.json</span>
-            <input
-              value={mapPath}
-              spellcheck={false}
-              onInput={(event) => onMapPathChange(event.currentTarget.value)}
-            />
-          </label>
-
-          <button type="button" className="primary-action" onClick={onLoadMap} disabled={loadingMap}>
+      <section className="source-panel__section">
+        <Field label="Target">
+          <select
+            className="gsv-select"
+            onChange={(event) => onTargetChange(event.currentTarget.value)}
+            value={target}
+          >
+            <option value="gsv">gsv</option>
+            {devices.map((device) => (
+              <option disabled={!device.online} key={device.deviceId} value={device.deviceId}>
+                {device.label}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field label="strudel.json">
+          <input
+            className="gsv-input"
+            onInput={(event) => onMapPathChange(event.currentTarget.value)}
+            value={mapPath}
+          />
+        </Field>
+        <div className="button-row">
+          <Button disabled={loadingMap} onClick={onLoadMap}>
             {loadingMap ? "Loading" : "Load map"}
+          </Button>
+          <Button disabled={stagingPack} kind="primary" onClick={onStagePack}>
+            {stagingPack ? "Staging" : "Stage pack"}
+          </Button>
+        </div>
+      </section>
+
+      <section className="source-panel__section">
+        <Field label="Pack label">
+          <input
+            className="gsv-input"
+            onInput={(event) => onPackLabelChange(event.currentTarget.value)}
+            value={packLabel}
+          />
+        </Field>
+        {loadedMap ? (
+          <div className="source-summary">
+            <StatusPill tone="good">{loadedMap.sampleCount} samples</StatusPill>
+            <span>{loadedMap.target}:{loadedMap.path}</span>
+          </div>
+        ) : null}
+        {stagedPack ? (
+          <div className="source-summary">
+            <StatusPill tone="good">{stagedPack.copiedFiles.length} copied</StatusPill>
+            <span>{stagedPack.stagedMapPath}</span>
+          </div>
+        ) : null}
+        {stageResult?.ok === false ? (
+          <p className="inline-error">{stageResult.errorText}</p>
+        ) : null}
+        {sourceWarning ? <p className="inline-warning">{sourceWarning}</p> : null}
+      </section>
+
+      <section className="source-panel__section source-panel__devices">
+        <div className="mini-heading">Connected targets</div>
+        {devices.length === 0 ? (
+          <p className="muted">Only the GSV filesystem is available.</p>
+        ) : devices.map((device) => (
+          <button
+            className={`device-row ${target === device.deviceId ? "is-selected" : ""}`}
+            disabled={!device.online}
+            key={device.deviceId}
+            onClick={() => onTargetChange(device.deviceId)}
+            type="button"
+          >
+            <span>{device.label}</span>
+            <StatusPill tone={device.online ? "good" : "bad"}>{device.online ? "online" : "offline"}</StatusPill>
           </button>
-
-          <dl className="source-facts">
-            <div>
-              <dt>Loaded</dt>
-              <dd>{loadedMap ? `${loadedMap.sampleCount} sounds` : "none"}</dd>
-            </div>
-            <div>
-              <dt>Source</dt>
-              <dd title={sourceLabel}>{sourceLabel}</dd>
-            </div>
-          </dl>
-        </div>
-      ) : (
-        <div className="source-form">
-          <label>
-            <span>Sample source</span>
-            <input
-              value={sourceUrl}
-              spellcheck={false}
-              onInput={(event) => onSourceUrlChange(event.currentTarget.value)}
-            />
-          </label>
-          <dl className="source-facts">
-            <div>
-              <dt>Source</dt>
-              <dd title={sourceLabel}>{sourceLabel}</dd>
-            </div>
-          </dl>
-        </div>
-      )}
-
-      {sourceWarning ? <p className="source-warning">{sourceWarning}</p> : null}
-
-      <button type="button" className="launch-action" onClick={onLaunch}>
-        Launch session
-      </button>
+        ))}
+      </section>
     </aside>
   );
 }

@@ -1,75 +1,68 @@
 .editor-pane {
-  min-width: 0;
-  min-height: 0;
-  display: grid;
-  grid-template-rows: auto minmax(180px, 0.64fr) minmax(120px, 0.36fr);
-  background: #ffffff;
-}
-
-.editor-pane__bar {
+  flex: 1;
+  min-height: 360px;
   display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 42px;
-  padding: 8px 12px;
-  border-bottom: 1px solid #d7dde7;
-}
-
-.editor-pane__bar h2 {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 650;
-}
-
-.editor-pane__bar button {
-  margin-left: auto;
-  height: 28px;
-  padding: 0 10px;
-  border-radius: 6px;
+  flex-direction: column;
 }
 
 .pattern-editor {
-  width: 100%;
-  height: 100%;
-  min-width: 0;
-  min-height: 0;
-  padding: 12px;
+  flex: 1;
+  min-height: 300px;
   border: 0;
-  border-bottom: 1px solid #d7dde7;
-  border-radius: 0;
-  resize: none;
-  color: #18202a;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-  font-size: 13px;
+  padding: 14px;
   line-height: 1.55;
+  font-size: 14px;
+  tab-size: 2;
 }
 
-.session-code {
+.scene-slots {
+  flex: 0 0 auto;
+}
+
+.scene-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  padding: 10px;
+}
+
+.scene-card {
   min-width: 0;
-  min-height: 0;
-  overflow: auto;
-  background: #f6f7f9;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  padding: 9px;
+  display: grid;
+  gap: 8px;
 }
 
-.session-code summary {
-  position: sticky;
-  top: 0;
-  padding: 9px 12px;
-  border-bottom: 1px solid #d7dde7;
-  background: #f6f7f9;
-  color: #4f5a64;
-  cursor: pointer;
+.scene-card.is-empty {
+  opacity: 0.68;
+}
+
+.scene-card > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.scene-card strong {
   font-size: 12px;
-  font-weight: 650;
 }
 
-.session-code pre {
+.scene-card span,
+.scene-card p {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.scene-card p {
+  min-height: 30px;
   margin: 0;
-  padding: 12px;
-  white-space: pre-wrap;
-  word-break: break-word;
-  color: #25303b;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-  font-size: 12px;
-  line-height: 1.5;
+  overflow: hidden;
+}
+
+.scene-card__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 32px;
+  gap: 6px;
 }

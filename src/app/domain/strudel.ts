@@ -1,7 +1,13 @@
-import type { LoadedSampleMap, SampleMapDocument, SourcePreludeResult } from "../types";
+import type {
+  LoadedSampleMap,
+  SampleMapDocument,
+  SourcePreludeResult,
+  StagedSamplePack,
+  WorkspaceScene,
+} from "../types";
 
-const STRUDEL_REPL_URL = "https://strudel.cc/";
-export const DEFAULT_SOURCE_URL = "github:tidalcycles/dirt-samples";
+export const DEFAULT_REMOTE_SOURCE = "github:tidalcycles/dirt-samples";
+export const DEFAULT_MAP_PATH = "/public/strudel/strudel.json";
 
 export const DEFAULT_PATTERN = `setcps(0.8)
 
@@ -12,20 +18,18 @@ stack(
   note("<c3 eb3 g3 bb3>*2").s("sawtooth").lpf(900).room(0.4)
 )`;
 
-function utf8ToBase64(value: string): string {
-  const bytes = new TextEncoder().encode(value);
-  let binary = "";
-  const chunkSize = 0x8000;
-  for (let index = 0; index < bytes.length; index += chunkSize) {
-    const chunk = bytes.subarray(index, index + chunkSize);
-    binary += String.fromCharCode(...chunk);
-  }
-  return btoa(binary);
-}
-
-export function buildStrudelUrl(code: string): string {
-  return `${STRUDEL_REPL_URL}#${encodeURIComponent(utf8ToBase64(code))}`;
-}
+export const EMPTY_SCENES: WorkspaceScene[] = [1, 2, 3, 4].map((slot) => ({
+  slot,
+  title: `Scene ${slot}`,
+  pattern: "",
+  sourceMode: "remote",
+  sourceLabel: "",
+  sourceTarget: "gsv",
+  sourcePath: "",
+  remoteSource: DEFAULT_REMOTE_SOURCE,
+  sampleNames: [],
+  capturedAt: 0,
+}));
 
 export function buildSessionCode(pattern: string, source: SourcePreludeResult): string {
   const body = pattern.trim();
@@ -35,32 +39,32 @@ export function buildSessionCode(pattern: string, source: SourcePreludeResult): 
   return `${source.code.trim()}\n\n${body}`;
 }
 
-export function sourcePreludeFromUrl(rawUrl: string, pageOrigin: string): SourcePreludeResult {
+export function sourcePreludeFromRemote(rawUrl: string): SourcePreludeResult {
   const source = rawUrl.trim();
   if (!source) {
     return {
       ok: false,
       code: "",
-      label: "No source",
-      warningText: "Sample source URL is required.",
+      label: "No remote source",
+      sampleNames: [],
+      warningText: "Remote sample source is required.",
     };
   }
-
-  const normalized = normalizeSampleBase(source, "gsv", "", pageOrigin);
-  if (!normalized.ok) {
+  if (!isSupportedRemoteBase(source)) {
     return {
       ok: false,
       code: "",
       label: source,
-      warningText: normalized.errorText,
+      sampleNames: [],
+      warningText: "Remote source must be HTTP(S), github:, or shabda:.",
     };
   }
-
   return {
     ok: true,
-    code: `samples(${JSON.stringify(normalized.value)});`,
-    label: normalized.value,
-    warningText: normalized.warningText,
+    code: `samples(${JSON.stringify(source)});`,
+    label: source,
+    sampleNames: [],
+    warningText: "",
   };
 }
 
@@ -69,8 +73,9 @@ export function sourcePreludeFromMap(loaded: LoadedSampleMap | null, pageOrigin:
     return {
       ok: false,
       code: "",
-      label: "No target map",
-      warningText: "Load a target sample map first.",
+      label: "No loaded map",
+      sampleNames: [],
+      warningText: "Load a sample map first.",
     };
   }
 
@@ -82,6 +87,7 @@ export function sourcePreludeFromMap(loaded: LoadedSampleMap | null, pageOrigin:
       ok: false,
       code: "",
       label,
+      sampleNames: loaded.sampleNames,
       warningText: base.errorText,
     };
   }
@@ -92,8 +98,58 @@ export function sourcePreludeFromMap(loaded: LoadedSampleMap | null, pageOrigin:
       ? `samples(${JSON.stringify(sampleMap, null, 2)}, ${JSON.stringify(base.value)});`
       : `samples(${JSON.stringify(sampleMap, null, 2)});`,
     label,
+    sampleNames: loaded.sampleNames,
     warningText: base.warningText,
   };
+}
+
+export function sourcePreludeFromStagedPack(pack: StagedSamplePack | null, pageOrigin: string): SourcePreludeResult {
+  if (!pack) {
+    return {
+      ok: false,
+      code: "",
+      label: "No staged pack",
+      sampleNames: [],
+      warningText: "Stage a sample pack first.",
+    };
+  }
+  const rawBase = typeof pack.map._base === "string" ? pack.map._base.trim() : "";
+  const publicBase = rawBase && isSupportedRemoteBase(rawBase)
+    ? rawBase
+    : absolutePublicPath(pack.publicBasePath, pageOrigin);
+  const sampleMap = cleanSampleMap(pack.map, "gsv", pageOrigin);
+  return {
+    ok: true,
+    code: `samples(${JSON.stringify(sampleMap, null, 2)}, ${JSON.stringify(publicBase)});`,
+    label: pack.packLabel,
+    sampleNames: pack.sampleNames,
+    warningText: pack.warnings.join(" "),
+  };
+}
+
+export function sampleNamesFromMap(map: SampleMapDocument): string[] {
+  return Object.keys(map)
+    .filter((key) => key !== "_base" && !key.startsWith("_"))
+    .sort((left, right) => left.localeCompare(right));
+}
+
+export function formatTimestamp(timestamp: number): string {
+  if (!timestamp) {
+    return "empty";
+  }
+  return new Intl.DateTimeFormat(undefined, {
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(timestamp));
+}
+
+export function summarizeSamples(sampleNames: string[], limit = 12): string {
+  if (sampleNames.length === 0) {
+    return "no named samples";
+  }
+  const visible = sampleNames.slice(0, limit).join(", ");
+  const hidden = sampleNames.length - limit;
+  return hidden > 0 ? `${visible} +${hidden}` : visible;
 }
 
 function cleanSampleMap(map: SampleMapDocument, target: string, pageOrigin: string): Record<string, unknown> {
@@ -122,7 +178,7 @@ function sampleMapBase(
   if (target === "gsv" && path.startsWith("/public/")) {
     return {
       ok: true,
-      value: absolutePublicBase(parentPath(path), pageOrigin),
+      value: absolutePublicPath(parentPath(path), pageOrigin),
       warningText: "",
     };
   }
@@ -138,7 +194,7 @@ function sampleMapBase(
   return {
     ok: true,
     value: "",
-    warningText: "Relative audio paths need a _base URL, github shortcut, or GSV /public path.",
+    warningText: "Relative audio paths need staging before the browser can play them.",
   };
 }
 
@@ -156,23 +212,23 @@ function normalizeSampleBase(
     if (target !== "gsv") {
       return {
         ok: false,
-        errorText: "Device target sample maps need HTTP(S), github:, or another browser-reachable base.",
+        errorText: "Device sample maps with /public bases must be staged into GSV first.",
       };
     }
-    return { ok: true, value: absolutePublicBase(rawBase, pageOrigin), warningText: "" };
+    return { ok: true, value: absolutePublicPath(rawBase, pageOrigin), warningText: "" };
   }
 
   if (target === "gsv" && mapPath.startsWith("/public/") && !rawBase.startsWith("/")) {
     return {
       ok: true,
-      value: absolutePublicBase(`${parentPath(mapPath)}/${rawBase}`, pageOrigin),
+      value: absolutePublicPath(`${parentPath(mapPath)}/${rawBase}`, pageOrigin),
       warningText: "",
     };
   }
 
   return {
     ok: false,
-    errorText: "Sample source must be HTTP(S), github:, shabda:, or a GSV /public path.",
+    errorText: "Sample source must be HTTP(S), github:, shabda:, or staged under GSV /public.",
   };
 }
 
@@ -183,7 +239,7 @@ function isSupportedRemoteBase(value: string): boolean {
 function normalizeSampleValue(value: unknown, target: string, pageOrigin: string): unknown {
   if (typeof value === "string") {
     return target === "gsv" && value.startsWith("/public/")
-      ? absolutePublicBase(value, pageOrigin)
+      ? absolutePublicPath(value, pageOrigin)
       : value;
   }
   if (Array.isArray(value)) {
@@ -201,7 +257,7 @@ function normalizeSampleValue(value: unknown, target: string, pageOrigin: string
 
 function allSampleValuesAreBrowserReachable(value: unknown): boolean {
   if (typeof value === "string") {
-    return isSupportedRemoteBase(value);
+    return isSupportedRemoteBase(value) || value.startsWith("http://") || value.startsWith("https://");
   }
   if (Array.isArray(value)) {
     return value.every(allSampleValuesAreBrowserReachable);
@@ -212,7 +268,7 @@ function allSampleValuesAreBrowserReachable(value: unknown): boolean {
   return true;
 }
 
-function absolutePublicBase(path: string, pageOrigin: string): string {
+function absolutePublicPath(path: string, pageOrigin: string): string {
   return new URL(normalizeSlashes(path), pageOrigin).toString();
 }
 
