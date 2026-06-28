@@ -15,7 +15,6 @@ declare module "@strudel/web" {
   export function initStrudel(options?: {
     prebake?: () => void | Promise<void>;
     miniAllStrings?: boolean;
-    sharedWorker?: boolean;
     onToggle?: (started: boolean) => void;
     onEvalError?: (error: Error) => void;
     onSchedulerError?: (error: Error) => void;

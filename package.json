@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@humansandmachines/gsv": "0.0.4",
-    "@strudel/web": "1.3.0",
+    "@strudel/web": "1.0.3",
     "preact": "^10.27.2"
   },
   "devDependencies": {

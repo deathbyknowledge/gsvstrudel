@@ -24,7 +24,6 @@ export function useStrudelRuntime(): RuntimeApi {
     if (!initRef.current) {
       setRuntime((current) => ({ ...current, status: "initializing", errorText: "" }));
       initRef.current = initStrudel({
-        sharedWorker: false,
         onToggle: (started) => {
           setRuntime((current) => ({
             ...current,

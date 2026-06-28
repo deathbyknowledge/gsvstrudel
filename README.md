@@ -40,6 +40,10 @@ therefore licensed as AGPL-3.0-or-later.
 
 ## Development
 
+`@strudel/web` is pinned to `1.0.3` because newer `1.1+` bundles publish a
+worker asset reference that the current GSV package assembler resolves as a
+missing `assets/clockworker-*.js` module.
+
 ```bash
 npm run check
 npm run build
