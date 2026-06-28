@@ -13,7 +13,7 @@ sample staging and co-producer process control.
 - Load an existing `strudel.json` from GSV or a connected device.
 - Stage a device-backed sample map into `/public/strudel-live/packs/<pack>/`
   with `fs.copy`, then play it from browser-safe GSV URLs.
-- Capture four local scene slots for fast workspace recall.
+- Capture four in-window scene slots for fast workspace recall.
 - Start a visible `strudel-live#coproducer` package-profile process and send it
   the current pattern, source label, and sample names.
 
@@ -43,6 +43,9 @@ therefore licensed as AGPL-3.0-or-later.
 `@strudel/web` is pinned to `1.0.3` because newer `1.1+` bundles publish a
 worker asset reference that the current GSV package assembler resolves as a
 missing `assets/clockworker-*.js` module.
+
+Scene slots are intentionally in memory for now because GSV package app frames
+are sandboxed without same-origin browser storage.
 
 ```bash
 npm run check

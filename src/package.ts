@@ -12,7 +12,6 @@ export default definePackage({
     },
     capabilities: {
       kernel: ["sys.device.list", "fs.read", "fs.write", "fs.copy", "proc.spawn", "proc.send", "proc.history"],
-      outbound: ["https://raw.githubusercontent.com"],
     },
   },
   browser: {
