@@ -1,5 +1,5 @@
 import { render } from "preact";
-import { getBackend, setAppError, setAppReady } from "@humansandmachines/gsv/sdk/browser";
+import { getBackend, setAppError, setAppReady } from "@humansandmachines/gsv/sdk";
 import { App } from "./app";
 import type { StrudelBackend } from "./types";
 

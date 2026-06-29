@@ -1,4 +1,4 @@
-import { PackageBackendEntrypoint } from "@humansandmachines/gsv/sdk/backend";
+import { PackageBackendEntrypoint } from "@humansandmachines/gsv/sdk";
 import type {
   CoProducerHistoryResult,
   CoProducerMessage,

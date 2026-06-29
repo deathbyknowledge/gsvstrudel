@@ -5,10 +5,10 @@
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "check": "tsc --noEmit",
-    "build": "esbuild src/app/main.tsx --bundle --platform=browser --format=esm --jsx=automatic --jsx-import-source=preact --external:@gsv/package/* --outfile=dist/app.js"
+    "build": "esbuild src/app/main.tsx --bundle --platform=browser --format=esm --jsx=automatic --jsx-import-source=preact --outfile=dist/app.js"
   },
   "dependencies": {
-    "@humansandmachines/gsv": "0.0.4",
+    "@humansandmachines/gsv": "0.0.5",
     "@strudel/web": "1.0.3",
     "preact": "^10.27.2"
   },
