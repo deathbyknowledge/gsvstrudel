@@ -10,6 +10,7 @@
   "dependencies": {
     "@humansandmachines/gsv": "0.0.5",
     "@strudel/web": "1.0.3",
+    "acorn": "^8.11.3",
     "preact": "^10.27.2"
   },
   "devDependencies": {

@@ -1,5 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "preact/hooks";
-import { evaluate, hush, initStrudel } from "@strudel/web";
+import {
+  defaultPrebake,
+  getAudioContext,
+  initAudioOnFirstClick,
+  miniAllStrings,
+  repl,
+  transpiler,
+  webaudioOutput,
+} from "@strudel/web";
+import type { StrudelRuntimeRepl } from "@strudel/web";
+import { normalizeStrudelCode } from "../domain/strudel";
 import type { RuntimeState } from "../types";
 
 type RuntimeApi = {
@@ -14,6 +24,7 @@ function errorText(error: unknown): string {
 
 export function useStrudelRuntime(): RuntimeApi {
   const initRef = useRef<Promise<void> | null>(null);
+  const replRef = useRef<StrudelRuntimeRepl | null>(null);
   const [runtime, setRuntime] = useState<RuntimeState>({
     status: "idle",
     errorText: "",
@@ -28,11 +39,12 @@ export function useStrudelRuntime(): RuntimeApi {
           reject(new Error("Strudel did not finish initializing."));
         }, 20_000);
         try {
-          initStrudel({
-            prebake: () => {
-              window.clearTimeout(timeout);
-              resolve();
-            },
+          initAudioOnFirstClick();
+          miniAllStrings();
+          replRef.current = repl({
+            getTime: () => getAudioContext().currentTime,
+            defaultOutput: webaudioOutput,
+            transpiler: (code) => transpiler(normalizeStrudelCode(code)),
             onToggle: (started) => {
               setRuntime((current) => ({
                 ...current,
@@ -54,8 +66,19 @@ export function useStrudelRuntime(): RuntimeApi {
               }));
             },
           });
+          void defaultPrebake()
+            .then(() => {
+              window.clearTimeout(timeout);
+              resolve();
+            })
+            .catch((error) => {
+              window.clearTimeout(timeout);
+              replRef.current = null;
+              reject(error);
+            });
         } catch (error) {
           window.clearTimeout(timeout);
+          replRef.current = null;
           reject(error);
         }
       });
@@ -64,6 +87,7 @@ export function useStrudelRuntime(): RuntimeApi {
       await initRef.current;
     } catch (error) {
       initRef.current = null;
+      replRef.current = null;
       throw error;
     }
   }, []);
@@ -71,8 +95,18 @@ export function useStrudelRuntime(): RuntimeApi {
   const play = useCallback(async (code: string) => {
     try {
       await ensureInitialized();
+      const runner = replRef.current;
+      if (!runner) {
+        throw new Error("Strudel runtime did not initialize.");
+      }
       setRuntime((current) => ({ ...current, status: "evaluating", errorText: "" }));
-      await evaluate(code, true);
+      const pattern = await runner.evaluate(code, true, true);
+      if (runner.state.evalError || runner.state.schedulerError) {
+        throw runner.state.evalError ?? runner.state.schedulerError;
+      }
+      if (!pattern) {
+        throw new Error("Strudel did not return a playable pattern.");
+      }
       setRuntime({
         status: "playing",
         errorText: "",
@@ -93,7 +127,7 @@ export function useStrudelRuntime(): RuntimeApi {
       return;
     }
     try {
-      hush();
+      replRef.current?.stop();
       setRuntime((current) => ({ ...current, status: "stopped", errorText: "" }));
     } catch (error) {
       setRuntime((current) => ({
@@ -106,7 +140,7 @@ export function useStrudelRuntime(): RuntimeApi {
 
   useEffect(() => () => {
     try {
-      hush();
+      replRef.current?.stop();
     } catch {
       // Strudel may never have initialized; unmount cleanup should stay silent.
     }

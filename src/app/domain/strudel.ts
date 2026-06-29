@@ -1,3 +1,4 @@
+import { parse } from "acorn";
 import type {
   LoadedSampleMap,
   SampleMapDocument,
@@ -5,6 +6,31 @@ import type {
   StagedSamplePack,
   WorkspaceScene,
 } from "../types";
+
+type ParsedNode = {
+  type: string;
+  start: number;
+  end: number;
+};
+
+type ParsedProgram = ParsedNode & {
+  body: ParsedNode[];
+};
+
+type ParsedExpressionStatement = ParsedNode & {
+  expression: ParsedNode;
+};
+
+type ParsedLabeledStatement = ParsedNode & {
+  label: ParsedNode & { name: string };
+  body: ParsedNode;
+};
+
+type SourceEdit = {
+  start: number;
+  end: number;
+  text: string;
+};
 
 export const DEFAULT_REMOTE_SOURCE = "github:tidalcycles/dirt-samples";
 export const DEFAULT_MAP_PATH = "/public/strudel/strudel.json";
@@ -37,6 +63,14 @@ export function buildSessionCode(pattern: string, source: SourcePreludeResult): 
     return body;
   }
   return `${source.code.trim()}\n\n${body}`;
+}
+
+export function normalizeStrudelCode(code: string): string {
+  const edits = strudelLabelEdits(code);
+  if (edits.length === 0) {
+    return code;
+  }
+  return applySourceEdits(code, edits);
 }
 
 export function sourcePreludeFromRemote(rawUrl: string): SourcePreludeResult {
@@ -207,6 +241,65 @@ function singleQuotedString(value: string): string {
     .replace(/\n/g, "\\n")
     .replace(/\u2028/g, "\\u2028")
     .replace(/\u2029/g, "\\u2029")}'`;
+}
+
+function strudelLabelEdits(code: string): SourceEdit[] {
+  let program: ParsedProgram;
+  try {
+    program = parse(code, {
+      allowAwaitOutsideFunction: true,
+      ecmaVersion: 2022,
+      locations: true,
+      sourceType: "script",
+    }) as ParsedProgram;
+  } catch {
+    return [];
+  }
+
+  const edits: SourceEdit[] = [];
+  for (const statement of program.body) {
+    if (!isLabeledExpressionStatement(statement)) {
+      continue;
+    }
+
+    const colonEnd = labelColonEnd(code, statement);
+    if (statement.label.name === "$") {
+      edits.push({ start: statement.start, end: colonEnd, text: "" });
+      continue;
+    }
+
+    edits.push({ start: statement.start, end: colonEnd, text: "(" });
+    edits.push({
+      start: statement.body.expression.end,
+      end: statement.body.expression.end,
+      text: `).p(${singleQuotedString(statement.label.name)});`,
+    });
+  }
+  return edits;
+}
+
+function isLabeledExpressionStatement(statement: ParsedNode): statement is ParsedLabeledStatement & {
+  body: ParsedExpressionStatement;
+} {
+  return statement.type === "LabeledStatement"
+    && (statement as ParsedLabeledStatement).body?.type === "ExpressionStatement"
+    && typeof (statement as ParsedLabeledStatement).label?.name === "string";
+}
+
+function labelColonEnd(code: string, statement: ParsedLabeledStatement): number {
+  const colon = code.indexOf(":", statement.label.end);
+  if (colon < 0 || colon > statement.body.start) {
+    return statement.body.start;
+  }
+  return colon + 1;
+}
+
+function applySourceEdits(code: string, edits: SourceEdit[]): string {
+  return edits
+    .sort((left, right) => right.start - left.start || right.end - left.end)
+    .reduce((current, edit) => (
+      `${current.slice(0, edit.start)}${edit.text}${current.slice(edit.end)}`
+    ), code);
 }
 
 function cleanSampleMap(map: SampleMapDocument, target: string, pageOrigin: string): Record<string, unknown> {
