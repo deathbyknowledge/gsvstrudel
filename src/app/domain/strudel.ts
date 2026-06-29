@@ -61,7 +61,7 @@ export function sourcePreludeFromRemote(rawUrl: string): SourcePreludeResult {
   }
   return {
     ok: true,
-    code: `samples(${JSON.stringify(source)});`,
+    code: `samples(${strudelJsLiteral(source)});`,
     label: source,
     sampleNames: [],
     warningText: "",
@@ -95,8 +95,8 @@ export function sourcePreludeFromMap(loaded: LoadedSampleMap | null, pageOrigin:
   return {
     ok: true,
     code: base.value
-      ? `samples(${JSON.stringify(sampleMap, null, 2)}, ${JSON.stringify(base.value)});`
-      : `samples(${JSON.stringify(sampleMap, null, 2)});`,
+      ? `samples(${strudelJsLiteral(sampleMap, 2)}, ${strudelJsLiteral(base.value)});`
+      : `samples(${strudelJsLiteral(sampleMap, 2)});`,
     label,
     sampleNames: loaded.sampleNames,
     warningText: base.warningText,
@@ -120,7 +120,7 @@ export function sourcePreludeFromStagedPack(pack: StagedSamplePack | null, pageO
   const sampleMap = cleanSampleMap(pack.map, "gsv", pageOrigin);
   return {
     ok: true,
-    code: `samples(${JSON.stringify(sampleMap, null, 2)}, ${JSON.stringify(publicBase)});`,
+    code: `samples(${strudelJsLiteral(sampleMap, 2)}, ${strudelJsLiteral(publicBase)});`,
     label: pack.packLabel,
     sampleNames: pack.sampleNames,
     warningText: pack.warnings.join(" "),
@@ -150,6 +150,63 @@ export function summarizeSamples(sampleNames: string[], limit = 12): string {
   const visible = sampleNames.slice(0, limit).join(", ");
   const hidden = sampleNames.length - limit;
   return hidden > 0 ? `${visible} +${hidden}` : visible;
+}
+
+function strudelJsLiteral(value: unknown, indent = 0): string {
+  return formatJsLiteral(value, indent, 0);
+}
+
+function formatJsLiteral(value: unknown, indent: number, depth: number): string {
+  if (typeof value === "string") {
+    return singleQuotedString(value);
+  }
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? String(value) : "null";
+  }
+  if (typeof value === "boolean") {
+    return value ? "true" : "false";
+  }
+  if (value === null || value === undefined) {
+    return "null";
+  }
+  if (Array.isArray(value)) {
+    const entries = value.map((entry) => formatJsLiteral(entry, indent, depth + 1));
+    if (!indent) {
+      return `[${entries.join(",")}]`;
+    }
+    if (entries.length === 0) {
+      return "[]";
+    }
+    const pad = " ".repeat(indent * (depth + 1));
+    const endPad = " ".repeat(indent * depth);
+    return `[\n${pad}${entries.join(`,\n${pad}`)}\n${endPad}]`;
+  }
+  if (typeof value === "object") {
+    const entries = Object.entries(value as Record<string, unknown>).map(([key, entry]) => {
+      const formatted = formatJsLiteral(entry, indent, depth + 1);
+      return indent
+        ? `${" ".repeat(indent * (depth + 1))}${singleQuotedString(key)}: ${formatted}`
+        : `${singleQuotedString(key)}:${formatted}`;
+    });
+    if (!indent) {
+      return `{${entries.join(",")}}`;
+    }
+    if (entries.length === 0) {
+      return "{}";
+    }
+    return `{\n${entries.join(",\n")}\n${" ".repeat(indent * depth)}}`;
+  }
+  return "null";
+}
+
+function singleQuotedString(value: string): string {
+  return `'${value
+    .replace(/\\/g, "\\\\")
+    .replace(/'/g, "\\'")
+    .replace(/\r/g, "\\r")
+    .replace(/\n/g, "\\n")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029")}'`;
 }
 
 function cleanSampleMap(map: SampleMapDocument, target: string, pageOrigin: string): Record<string, unknown> {
