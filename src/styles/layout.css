@@ -1,59 +1,19 @@
 .strudel-app {
-  min-height: 100vh;
+  height: 100vh;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 14px;
-}
-
-.app-header {
-  min-height: 58px;
-  border: 1px solid var(--line);
-  background: rgba(11, 14, 17, 0.92);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 10px 14px;
-}
-
-.app-header h1 {
-  margin: 0;
-  font-family: "Space Grotesk", "Departure Mono", monospace;
-  font-size: 22px;
-  font-weight: 600;
-  letter-spacing: 0;
-}
-
-.app-kicker {
-  display: block;
-  margin-bottom: 2px;
-  color: var(--green);
-  font-size: 11px;
-  text-transform: uppercase;
-}
-
-.app-header__meta {
-  display: flex;
-  align-items: center;
   gap: 10px;
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.app-header__meta button {
-  border: 1px solid var(--line);
-  background: var(--panel-2);
-  color: var(--text);
-  padding: 7px 10px;
+  padding: 10px;
+  overflow: hidden;
 }
 
 .app-grid {
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(250px, 300px) minmax(420px, 1fr) minmax(300px, 380px);
-  gap: 12px;
+  grid-template-columns: minmax(248px, 296px) minmax(420px, 1fr) minmax(300px, 372px);
+  gap: 10px;
 }
 
 .source-panel,
@@ -76,12 +36,15 @@
 .inspector-panel,
 .transport-bar {
   border: 1px solid var(--line);
-  background: rgba(11, 14, 17, 0.95);
+  background: var(--panel);
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px rgba(6, 4, 20, 0.72);
 }
 
 .panel-title {
   min-height: 38px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--rule-inner);
+  background: var(--header-bar);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -95,10 +58,11 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0;
+  color: var(--text-title);
 }
 
 .panel-title > span {
-  color: var(--muted);
+  color: var(--meta);
   font-size: 11px;
 }
 

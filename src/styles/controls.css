@@ -1,11 +1,16 @@
 .gsv-button,
 .gsv-icon-button {
   border: 1px solid var(--line-strong);
-  background: var(--panel-2);
-  color: var(--text);
+  background: transparent;
+  color: var(--accent);
   min-height: 32px;
   padding: 0 11px;
   cursor: pointer;
+  border-radius: 0;
+  font-size: 11px;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  transition: background 0.12s, border-color 0.12s, color 0.12s, box-shadow 0.12s;
 }
 
 .gsv-icon-button {
@@ -14,15 +19,16 @@
 }
 
 .gsv-button--primary {
-  border-color: rgba(142, 230, 176, 0.7);
-  background: rgba(142, 230, 176, 0.14);
-  color: var(--green);
+  border-color: var(--primary-hi);
+  background: var(--dashed);
+  color: #ffffff;
+  box-shadow: 0 0 18px rgba(120, 110, 230, 0.28);
 }
 
 .gsv-button--danger {
-  border-color: rgba(255, 122, 122, 0.6);
-  background: rgba(255, 122, 122, 0.1);
-  color: var(--red);
+  border-color: var(--danger-hi);
+  background: color-mix(in srgb, var(--danger) 52%, transparent);
+  color: color-mix(in srgb, var(--error) 82%, var(--text));
 }
 
 .gsv-button:disabled,
@@ -33,7 +39,14 @@
 
 .gsv-button:not(:disabled):hover,
 .gsv-icon-button:not(:disabled):hover {
-  background: var(--panel-3);
+  border-color: var(--accent);
+  background: var(--hover);
+  color: var(--text-hi);
+}
+
+.gsv-button--primary:not(:disabled):hover {
+  background: var(--primary-hi);
+  box-shadow: 0 0 26px rgba(120, 110, 230, 0.48);
 }
 
 .gsv-field {
@@ -42,7 +55,7 @@
 }
 
 .gsv-field__label {
-  color: var(--muted);
+  color: var(--label);
   font-size: 11px;
   text-transform: uppercase;
 }
@@ -58,8 +71,9 @@
 .pattern-editor {
   width: 100%;
   border: 1px solid var(--line);
-  background: #07090b;
+  background: var(--field-deep);
   color: var(--text);
+  border-radius: 0;
 }
 
 .gsv-input,
@@ -75,39 +89,39 @@
   min-height: 22px;
   border: 1px solid var(--line);
   padding: 0 7px;
-  color: var(--muted);
-  background: rgba(255, 255, 255, 0.03);
+  color: var(--meta);
+  background: color-mix(in srgb, var(--panel-2) 86%, var(--accent) 4%);
   font-size: 11px;
   white-space: nowrap;
 }
 
 .status-pill--good {
-  border-color: rgba(142, 230, 176, 0.5);
+  border-color: color-mix(in srgb, var(--online) 52%, var(--border));
   color: var(--green);
 }
 
 .status-pill--warn {
-  border-color: rgba(242, 197, 107, 0.55);
+  border-color: color-mix(in srgb, var(--warn) 56%, var(--border));
   color: var(--amber);
 }
 
 .status-pill--bad {
-  border-color: rgba(255, 122, 122, 0.55);
+  border-color: color-mix(in srgb, var(--error) 56%, var(--border));
   color: var(--red);
 }
 
 .mode-switch {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--rule-inner);
 }
 
 .mode-switch button {
   min-width: 0;
   border: 0;
-  border-right: 1px solid var(--line);
+  border-right: 1px solid var(--rule-inner);
   background: transparent;
-  color: var(--muted);
+  color: var(--meta);
   min-height: 36px;
   cursor: pointer;
 }
@@ -117,6 +131,7 @@
 }
 
 .mode-switch button.is-active {
-  color: var(--green);
-  background: rgba(142, 230, 176, 0.1);
+  color: var(--accent-bright);
+  background: var(--selected);
+  box-shadow: inset 0 2px 0 var(--accent-bright);
 }

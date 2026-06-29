@@ -7,7 +7,7 @@
 .source-panel__section {
   display: grid;
   gap: 10px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--rule-inner);
   padding: 12px;
 }
 
@@ -19,9 +19,9 @@
   display: grid;
   gap: 7px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.03);
+  background: color-mix(in srgb, var(--panel-2) 86%, var(--accent) 4%);
   padding: 9px;
-  color: var(--muted);
+  color: var(--meta);
   font-size: 12px;
   word-break: break-word;
 }
@@ -45,8 +45,9 @@
 }
 
 .device-row.is-selected {
-  border-color: rgba(130, 216, 255, 0.55);
-  background: rgba(130, 216, 255, 0.08);
+  border-color: var(--accent);
+  background: var(--selected);
+  color: var(--text-hi);
 }
 
 .device-row:disabled {

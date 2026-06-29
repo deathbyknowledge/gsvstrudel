@@ -1,23 +1,90 @@
 :root {
   color-scheme: dark;
-  font-family: "Departure Mono", "Space Mono", "SFMono-Regular", Consolas, monospace;
-  background: #050608;
-  color: #e7ece8;
-  --bg: #050608;
-  --panel: #0b0e11;
-  --panel-2: #11161a;
-  --panel-3: #171c20;
-  --line: #293037;
-  --line-strong: #3b4650;
-  --text: #e7ece8;
-  --muted: #94a19a;
-  --faint: #66726c;
-  --green: #8ee6b0;
-  --amber: #f2c56b;
-  --red: #ff7a7a;
-  --cyan: #82d8ff;
-  --magenta: #dc95ff;
-  --focus: #f5f1a6;
+  font-family: var(--gsv-font-mono);
+  background: var(--void);
+  color: var(--text);
+  --gsv-font-mono: "Departure Mono", "JetBrains Mono", "IBM Plex Mono", monospace;
+  --gsv-font-prose: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
+  --void: #07061a;
+  --panel: #0a0820;
+  --panel-2: #0a0822;
+  --node-bg: #0b0a1e;
+  --header-bar: #13112e;
+  --frame-lo: #08061c;
+  --frame-hi: #161240;
+  --field-deep: #070612;
+  --shadow-deep: #060414;
+  --frame-inset: #060414;
+  --border: #322e74;
+  --border-raised: #4a449e;
+  --rule-inner: #25224d;
+  --rule-section: #3a3676;
+  --bracket: #6b66c4;
+  --dashed: #5a52a8;
+  --hover: #171441;
+  --hover-nav: #1b1840;
+  --active: #201c4d;
+  --selected: #221d56;
+  --text-hi: #f4f2ff;
+  --text: #efeefe;
+  --text-title: #e2dfff;
+  --accent: #b3aeff;
+  --accent-bright: #cbc7ff;
+  --link: #8fb6ff;
+  --link-hover: #b8d2ff;
+  --label: #b3aee2;
+  --node-label: #c4bfee;
+  --text-muted: #8c86c8;
+  --prose-dim: #9089d4;
+  --meta: #7d78b8;
+  --text-dim: #565199;
+  --online: #5ef2a0;
+  --error: #ff6f8c;
+  --idle: #6661a0;
+  --update: #ffd24d;
+  --live: #8f8aff;
+  --bg-error: #170b17;
+  --bg-online: #081812;
+  --bg-warn: #181407;
+  --primary-hi: #6b62c4;
+  --danger: #a8324a;
+  --danger-hi: #c4445f;
+  --warn: #e0a64c;
+  --bg: var(--void);
+  --line: var(--border);
+  --line-strong: var(--border-raised);
+  --muted: var(--text-muted);
+  --faint: var(--text-dim);
+  --green: var(--online);
+  --amber: var(--warn);
+  --red: var(--error);
+  --cyan: var(--link);
+  --magenta: var(--accent-bright);
+  --focus: var(--accent);
+}
+
+@font-face {
+  font-family: "Departure Mono";
+  src: url("/fonts/DepartureMono-Regular.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("/fonts/SpaceGrotesk-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("/fonts/SpaceGrotesk-700.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
 
 * {
@@ -27,14 +94,18 @@
 html,
 body,
 #app {
-  min-height: 100%;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
 }
 
 body {
   margin: 0;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 180px),
-    var(--bg);
+    radial-gradient(1100px 720px at 48% -12%, rgba(150, 140, 255, 0.12), transparent 58%),
+    var(--void);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
 button,
@@ -52,7 +123,7 @@ input,
 textarea,
 select {
   color: var(--text);
-  background: #07090b;
+  background: var(--field-deep);
 }
 
 textarea {
@@ -60,8 +131,8 @@ textarea {
 }
 
 ::selection {
-  color: #050608;
-  background: var(--focus);
+  color: var(--void);
+  background: var(--accent-bright);
 }
 
 :focus-visible {
@@ -82,17 +153,36 @@ textarea {
   line-height: 1.45;
 }
 
+.app-warning {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.app-warning button {
+  flex: none;
+  min-height: 28px;
+  border: 1px solid var(--border-raised);
+  background: transparent;
+  color: var(--accent-bright);
+  cursor: pointer;
+  padding: 0 10px;
+  text-transform: uppercase;
+  font-size: 10px;
+}
+
 .inline-warning,
 .app-warning {
-  border-color: rgba(242, 197, 107, 0.45);
-  color: #f6dba0;
-  background: rgba(242, 197, 107, 0.08);
+  border-color: color-mix(in srgb, var(--warn) 56%, var(--border));
+  color: color-mix(in srgb, var(--warn) 78%, var(--text));
+  background: color-mix(in srgb, var(--bg-warn) 82%, var(--panel));
 }
 
 .inline-error {
-  border-color: rgba(255, 122, 122, 0.5);
-  color: #ffc1c1;
-  background: rgba(255, 122, 122, 0.08);
+  border-color: color-mix(in srgb, var(--error) 58%, var(--border));
+  color: color-mix(in srgb, var(--error) 78%, var(--text));
+  background: color-mix(in srgb, var(--bg-error) 82%, var(--panel));
 }
 
 .mini-heading {

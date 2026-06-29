@@ -287,21 +287,11 @@ export function App({ backend }: Props) {
 
   return (
     <main className="strudel-app">
-      <header className="app-header">
-        <div>
-          <span className="app-kicker">GSV PACKAGE</span>
-          <h1>Strudel Live</h1>
-        </div>
-        <div className="app-header__meta">
-          <span>{state.loading ? "loading targets" : `${devices.length + 1} targets`}</span>
-          {state.errorText || state.state?.deviceErrorText ? (
-            <button type="button" onClick={() => void state.reload()}>Retry targets</button>
-          ) : null}
-        </div>
-      </header>
-
       {state.errorText || state.state?.deviceErrorText ? (
-        <p className="app-warning">{state.errorText || state.state?.deviceErrorText}</p>
+        <div className="app-warning">
+          <span>{state.errorText || state.state?.deviceErrorText}</span>
+          <button type="button" onClick={() => void state.reload()}>Retry targets</button>
+        </div>
       ) : null}
 
       <div className="app-grid">
@@ -330,7 +320,7 @@ export function App({ backend }: Props) {
         <section className="live-desk">
           <TransportBar
             runtime={runtime.runtime}
-            sampleCount={sourcePrelude.sampleNames.length}
+            sampleCount={mode === "remote" ? null : sourcePrelude.sampleNames.length}
             sourceLabel={sourcePrelude.label}
             onCopy={copyCode}
             onPlay={play}

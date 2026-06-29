@@ -13,7 +13,7 @@ function errorText(error: unknown): string {
 }
 
 export function useStrudelRuntime(): RuntimeApi {
-  const initRef = useRef<Promise<unknown> | null>(null);
+  const initRef = useRef<Promise<void> | null>(null);
   const [runtime, setRuntime] = useState<RuntimeState>({
     status: "idle",
     errorText: "",
@@ -23,30 +23,49 @@ export function useStrudelRuntime(): RuntimeApi {
   const ensureInitialized = useCallback(async () => {
     if (!initRef.current) {
       setRuntime((current) => ({ ...current, status: "initializing", errorText: "" }));
-      initRef.current = initStrudel({
-        onToggle: (started) => {
-          setRuntime((current) => ({
-            ...current,
-            status: started ? "playing" : "stopped",
-          }));
-        },
-        onEvalError: (error) => {
-          setRuntime((current) => ({
-            ...current,
-            status: "error",
-            errorText: errorText(error),
-          }));
-        },
-        onSchedulerError: (error) => {
-          setRuntime((current) => ({
-            ...current,
-            status: "error",
-            errorText: errorText(error),
-          }));
-        },
+      initRef.current = new Promise<void>((resolve, reject) => {
+        const timeout = window.setTimeout(() => {
+          reject(new Error("Strudel did not finish initializing."));
+        }, 20_000);
+        try {
+          initStrudel({
+            prebake: () => {
+              window.clearTimeout(timeout);
+              resolve();
+            },
+            onToggle: (started) => {
+              setRuntime((current) => ({
+                ...current,
+                status: started ? "playing" : "stopped",
+              }));
+            },
+            onEvalError: (error) => {
+              setRuntime((current) => ({
+                ...current,
+                status: "error",
+                errorText: errorText(error),
+              }));
+            },
+            onSchedulerError: (error) => {
+              setRuntime((current) => ({
+                ...current,
+                status: "error",
+                errorText: errorText(error),
+              }));
+            },
+          });
+        } catch (error) {
+          window.clearTimeout(timeout);
+          reject(error);
+        }
       });
     }
-    await initRef.current;
+    try {
+      await initRef.current;
+    } catch (error) {
+      initRef.current = null;
+      throw error;
+    }
   }, []);
 
   const play = useCallback(async (code: string) => {

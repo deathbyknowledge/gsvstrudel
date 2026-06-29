@@ -16,7 +16,7 @@
 
 .transport-bar__status {
   min-width: 0;
-  color: var(--muted);
+  color: var(--meta);
   font-size: 12px;
 }
 

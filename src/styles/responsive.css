@@ -15,7 +15,6 @@
     padding: 8px;
   }
 
-  .app-header,
   .transport-bar {
     align-items: flex-start;
     flex-direction: column;

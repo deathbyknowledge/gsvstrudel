@@ -9,13 +9,13 @@
   grid-template-columns: 1fr 1fr 1fr;
   gap: 8px;
   padding: 10px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--rule-inner);
 }
 
 .coproducer-prompt {
   min-height: 86px;
   border-width: 0 0 1px;
-  border-color: var(--line);
+  border-color: var(--rule-inner);
   padding: 10px;
   line-height: 1.45;
 }
@@ -36,20 +36,20 @@
 
 .message {
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.03);
+  background: color-mix(in srgb, var(--panel-2) 86%, var(--accent) 4%);
   padding: 9px;
 }
 
 .message span {
   display: block;
   margin-bottom: 6px;
-  color: var(--cyan);
+  color: var(--link);
   font-size: 11px;
   text-transform: uppercase;
 }
 
 .message--assistant span {
-  color: var(--green);
+  color: var(--accent-bright);
 }
 
 .message p {

@@ -4,7 +4,7 @@ import { Button, StatusPill } from "./ui/Controls";
 type Props = {
   runtime: RuntimeState;
   sourceLabel: string;
-  sampleCount: number;
+  sampleCount: number | null;
   onPlay(): void;
   onStop(): void;
   onCopy(): void;
@@ -29,7 +29,7 @@ export function TransportBar({ onCopy, onPlay, onStop, runtime, sampleCount, sou
       <div className="transport-bar__status">
         <StatusPill tone={runtimeTone(runtime.status)}>{runtime.status}</StatusPill>
         <span className="transport-bar__source">{sourceLabel}</span>
-        <span>{sampleCount} samples</span>
+        <span>{sampleCount === null ? "remote pack" : `${sampleCount} samples`}</span>
       </div>
       <div className="transport-bar__actions">
         <Button disabled={runtime.status === "initializing" || runtime.status === "evaluating"} kind="primary" onClick={onPlay}>

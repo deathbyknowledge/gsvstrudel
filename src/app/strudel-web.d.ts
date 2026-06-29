@@ -18,7 +18,7 @@ declare module "@strudel/web" {
     onToggle?: (started: boolean) => void;
     onEvalError?: (error: Error) => void;
     onSchedulerError?: (error: Error) => void;
-  }): Promise<StrudelRepl>;
+  }): void;
 
   export function evaluate(code: string, autoplay?: boolean): Promise<unknown>;
   export function hush(): void;
